@@ -447,7 +447,8 @@ def calc_lfp_root_as_point(cell_x, cell_y, cell_z, x, y, z, sigma, r_limit,
 
     deltaS = _deltaS_calc(xstart, xend, ystart, yend, zstart, zend)
     h = _h_calc(xstart, xend, ystart, yend, zstart, zend, deltaS, x, y, z)
-    r2 = _r2_calc(xend, yend, zend, x, y, z, h)
+    l_ = h + deltaS
+    r2 = _r2_calc(xend, yend, zend, x, y, z, l_)
     r_root = _r_root_calc(xmid, ymid, zmid, x, y, z)
     if np.any(r_root < r_limit[rootinds]):
         print('Adjusting r-distance to root segments')
@@ -457,7 +458,6 @@ def calc_lfp_root_as_point(cell_x, cell_y, cell_z, x, y, z, sigma, r_limit,
     # avoid denominator approaching 0
     too_close_idxs = r2 < (r_limit * r_limit)
     r2[too_close_idxs] = r_limit[too_close_idxs]**2
-    l_ = h + deltaS
 
     hnegi = h < 0
     hposi = h >= 0
@@ -553,9 +553,9 @@ def _r2_calc(xend,
              x,
              y,
              z,
-             h):
+             l):
     """Subroutine used by calc_lfp_*()"""
-    r2 = (xend - x)**2 + (yend - y)**2 + (zend - z)**2 - h**2
+    r2 = (xend - x)**2 + (yend - y)**2 + (zend - z)**2 - l**2
     return np.abs(r2)
 
 
