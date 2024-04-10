@@ -635,8 +635,33 @@ class testLfpCalc(unittest.TestCase):
 
         np.testing.assert_almost_equal(value,value_expected)
 
-                                                             
+    def test_calc_lfp_linesource_backwards(self):
+        
+        '''Performs the same test as above, but with the first and last points of the neural segment reversed, to ensure that the result is not dependent on the choice of x_1 and x_2'''
 
+        cell = DummyCell(x=np.array([[1.,0.]]))
+
+        electrodeX = 2
+        electrodeY = 0
+        electrodeZ = 1
+
+        sigma = 1
+        r_limit = cell.d/2
+
+        value = lfpcalc._calc_lfp_linesource(cell.x[:, 0], cell.x[:, -1], 
+                                             cell.y[:, 0], cell.y[:, -1], 
+                                             cell.z[:, 0], cell.z[:, -1], 
+                                             electrodeX,electrodeY,electrodeZ, 
+                                             sigma,r_limit)
+
+        deltaS = 1
+        h_expected = 1
+        r_expected = 1
+        l_expected = 2
+
+        value_expected = 1/(4*np.pi*sigma*deltaS) * np.log( (l_expected+np.sqrt(l_expected**2+h_expected**2)) / (h_expected+np.sqrt(h_expected**2+r_expected**2)) ) 
+
+        np.testing.assert_almost_equal(value,value_expected)                                                            
 
 class DummyCell(CellGeometry):
     """CellGeometry like object with attributes for predicting extracellular
